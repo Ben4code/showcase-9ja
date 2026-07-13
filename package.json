@@ -1,32 +1,10 @@
 {
-  "name": "showcase-nigeria-server",
+  "name": "showcase-9ja",
   "version": "2.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev:server": "ts-node-dev --esm --respawn --transpile-only src/index.ts",
-    "dev:client": "cd client && npm run dev",
-    "build:client": "cd client && npm install && npm run build",
-    "build:server": "tsc -p tsconfig.json",
-    "build": "npm run build:client && npm run build:server",
-    "start": "NODE_ENV=production node dist/index.js",
-    "lint": "echo 'lint skipped'"
-  },
-  "dependencies": {
-    "@neondatabase/serverless": "^1.1.0",
-    "cors": "^2.8.5",
-    "dotenv": "^17.4.2",
-    "express": "^4.21.2",
-    "pg": "^8.22.0",
-    "socket.io": "^4.8.1"
-  },
-  "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/dotenv": "^6.1.1",
-    "@types/express": "^5.0.3",
-    "@types/node": "^22.15.31",
-    "@types/pg": "^8.20.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.8.3"
+    "dev": "cd client && npm run dev",
+    "build": "cd client && npm install && npm run build",
+    "preview": "cd client && npm run preview"
   }
 }
