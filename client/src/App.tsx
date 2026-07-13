@@ -21,12 +21,12 @@ export const useUser = () => useContext(UserContext);
 function AppContent() {
   const { state } = useGame();
   const { activeTab, session } = state;
-  const { name, country } = useUser();
+  const { name, country, setUser } = useUser();
   const showQuiz = !!session;
   const showOnboarding = !name || !country;
 
   if (showOnboarding) {
-    return <Onboarding onComplete={(n, c) => useUser().setUser(n, c)} />;
+    return <Onboarding onComplete={setUser} />;
   }
 
   return (

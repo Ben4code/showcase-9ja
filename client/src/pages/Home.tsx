@@ -110,7 +110,7 @@ export function Home() {
           <div className="flex items-center gap-3">
             <PlayCircle size={28} />
             <div className="text-left">
-              <p className="font-black text-base">Start Quiz</p>
+              <p className="font-black text-base">Explore Categories</p>
               <p className="text-xs text-white/70">Pick a category and test yourself</p>
             </div>
           </div>
