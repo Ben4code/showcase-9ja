@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SocketProvider } from './context/SocketContext';
 import { GameProvider, useGame } from './context/GameContext';
+import { ProgressProvider } from './context/ProgressContext';
 import { BottomNav } from './components/ui/BottomNav';
 import { Home } from './pages/Home';
 import { Categories } from './pages/Categories';
@@ -62,11 +63,13 @@ export default function App() {
   const darkMode = useDarkMode();
   return (
     <DarkModeContext.Provider value={darkMode}>
-      <SocketProvider>
-        <GameProvider>
-          <AppContent />
-        </GameProvider>
-      </SocketProvider>
+      <ProgressProvider>
+        <SocketProvider>
+          <GameProvider>
+            <AppContent />
+          </GameProvider>
+        </SocketProvider>
+      </ProgressProvider>
     </DarkModeContext.Provider>
   );
 }

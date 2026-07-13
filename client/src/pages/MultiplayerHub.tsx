@@ -223,7 +223,7 @@ export function MultiplayerHub() {
                   initial={{ opacity: 0, scale: 2 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0 }}
-                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+                  className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50"
                 >
                   <span className="text-[120px] font-black text-white">{state.countdown}</span>
                 </motion.div>

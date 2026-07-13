@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import type { QuestionPayload } from '../types/events.js';
+import { sql } from '../db.js';
 import {
   createRoom,
   getRoom,
@@ -32,6 +33,17 @@ function calcPoints(basePoints: number, remainingMs: number): number {
   return Math.max(10, Math.round((basePoints * multiplier) / 10) * 10);
 }
 
+function syncFinalScores(room: { categoryId: string; players: { username: string; score: number }[] }): void {
+  if (!sql) return;
+  const timestamp = Date.now();
+  for (const player of room.players) {
+    sql`
+      INSERT INTO leaderboard (username, score, category, timestamp)
+      VALUES (${player.username.slice(0, 20)}, ${player.score}, ${room.categoryId}, ${timestamp})
+    `.catch(err => console.error('[leaderboard sync]', err));
+  }
+}
+
 function advanceQuestion(io: Server, roomCode: string): void {
   const room = getRoom(roomCode);
   if (!room) return;
@@ -50,6 +62,7 @@ function advanceQuestion(io: Server, roomCode: string): void {
       finalScores: sorted.map(p => ({ username: p.username, score: p.score })),
       winner: sorted[0]?.username ?? 'No one',
     });
+    syncFinalScores(room);
     return;
   }
 

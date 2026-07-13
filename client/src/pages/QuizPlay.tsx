@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useGame } from '../context/GameContext';
-import { useProgress } from '../hooks/useProgress';
+import { useProgress } from '../context/ProgressContext';
 import { QuestionCard } from '../components/quiz/QuestionCard';
 import { TimerBar } from '../components/quiz/TimerBar';
 import { ResultsScreen } from '../components/quiz/ResultsScreen';
@@ -71,10 +71,24 @@ export function QuizPlay() {
       };
       recordResult(quizResult);
       setResult(quizResult);
+
+      if (progress.username.trim()) {
+        fetch('/api/leaderboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: progress.username,
+            score: quizResult.score,
+            category: quizResult.categoryId,
+          }),
+        }).catch(() => {
+          // Leaderboard sync is best-effort; local progress already saved.
+        });
+      }
     } else {
       dispatch({ type: 'NEXT_QUESTION' });
     }
-  }, [session, dispatch, recordResult]);
+  }, [session, dispatch, recordResult, progress.username]);
 
   const handleReplay = () => {
     dispatch({ type: 'RESET_SESSION' });

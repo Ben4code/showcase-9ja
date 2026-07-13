@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Edit3, Flame, Star, Target, Moon, Sun } from 'lucide-react';
-import { useProgress } from '../hooks/useProgress';
+import { useProgress } from '../context/ProgressContext';
 import { BADGES } from '../types/progress';
 import { useDark } from '../App';
 import logoImg from '../assets/logo2.png';
@@ -60,7 +60,7 @@ export function Profile() {
           ) : (
             <div className="flex items-center gap-2">
               <h1 className="text-white font-black text-xl">
-                {progress.username || 'Anonymous Naija'}
+                {progress.username || 'Anonymous User'}
               </h1>
               <button onClick={() => setEditingName(true)} aria-label="Edit username" className="text-white/60">
                 <Edit3 size={14} />

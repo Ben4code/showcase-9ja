@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy } from 'lucide-react';
-import { useProgress } from '../hooks/useProgress';
+import { useProgress } from '../context/ProgressContext';
 import { CATEGORIES } from '../types/quiz';
 
 interface LeaderboardEntry {

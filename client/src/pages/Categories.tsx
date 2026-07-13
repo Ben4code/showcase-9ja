@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useGame } from '../context/GameContext';
-import { useProgress } from '../hooks/useProgress';
+import { useProgress } from '../context/ProgressContext';
 import { CategoryCard } from '../components/ui/CategoryCard';
 import { CATEGORIES, type CategoryId } from '../types/quiz';
 import type { Question } from '../types/quiz';
@@ -41,17 +41,27 @@ function shuffle<T>(arr: T[]): T[] {
 
 export function Categories() {
   const { dispatch, state } = useGame();
-  const { progress } = useProgress();
+  const { progress, setUsername } = useProgress();
   const [selected, setSelected] = useState<CategoryId | null>(null);
+  const [nameInput, setNameInput] = useState('');
+
+  const needsName = !progress.username.trim();
 
   const confirmStart = (categoryId: CategoryId) => {
+    if (needsName) {
+      const trimmed = nameInput.trim();
+      if (!trimmed) return;
+      setUsername(trimmed);
+    }
     const questions = shuffle(QUESTION_BANK[categoryId]).slice(0, 10);
     dispatch({ type: 'START_SOLO', categoryId, questions });
     dispatch({ type: 'SET_TAB', tab: 'categories' });
     setSelected(null);
+    setNameInput('');
   };
 
   const selectedCat = CATEGORIES.find(c => c.id === selected);
+  const startDisabled = needsName && !nameInput.trim();
 
   // If a session is active, QuizPlay is rendered in App.tsx
   if (state.session) return null;
@@ -82,7 +92,7 @@ export function Categories() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 backdrop-blur-sm"
             onClick={() => setSelected(null)}
           >
             <motion.div
@@ -123,10 +133,36 @@ export function Categories() {
                 </div>
               </div>
 
+              {needsName && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6"
+                >
+                  <label htmlFor="quiz-username" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    What should we call you?
+                  </label>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 mb-2">
+                    Shows on your badges and the global leaderboard.
+                  </p>
+                  <input
+                    id="quiz-username"
+                    autoFocus
+                    className="w-full bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-2xl px-4 py-3 text-gray-900 dark:text-white font-medium focus:outline-none focus:border-nigerian-green dark:placeholder-gray-500"
+                    placeholder="Enter your name"
+                    value={nameInput}
+                    onChange={e => setNameInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && !startDisabled && confirmStart(selected)}
+                    maxLength={20}
+                  />
+                </motion.div>
+              )}
+
               <motion.button
                 whileTap={{ scale: 0.97 }}
+                disabled={startDisabled}
                 onClick={() => confirmStart(selected)}
-                className={`w-full bg-gradient-to-r ${selectedCat.bgGradient} text-white font-black py-4 rounded-2xl text-base shadow-lg`}
+                className={`w-full bg-gradient-to-r ${selectedCat.bgGradient} text-white font-black py-4 rounded-2xl text-base shadow-lg disabled:opacity-40`}
               >
                 Start Quiz {selectedCat.emoji}
               </motion.button>

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, PlayCircle, ChevronRight } from 'lucide-react';
+import { Flame, PlayCircle, ChevronRight, Sparkles, Users, Award, Globe2 } from 'lucide-react';
 import { useGame } from '../context/GameContext';
-import { useProgress } from '../hooks/useProgress';
+import { useProgress } from '../context/ProgressContext';
 import { CATEGORIES } from '../types/quiz';
 
 import welcomeImg from '../assets/welcome.jpg';
@@ -15,9 +15,40 @@ const HERO_IMAGES = [
   { url: CATEGORIES[0].imageUrl, caption: 'The best food in the world 🍲' },
   { url: CATEGORIES[1].imageUrl, caption: 'Afrobeats conquered the globe 🎵' },
   { url: CATEGORIES[2].imageUrl, caption: 'Rich culture, deep roots 🎭' },
-  { url: CATEGORIES[3].imageUrl, caption: '1996 — The Dream Team ⚽' },
+  { url: CATEGORIES[3].imageUrl, caption: 'Sports — The Dream Team ⚽' },
   { url: CATEGORIES[4].imageUrl, caption: 'Beautiful lands of Nigeria 🗺️' },
   { url: CATEGORIES[5].imageUrl, caption: 'Nollywood — second largest film industry 🎬' },
+];
+
+const WHY_PLAY = [
+  {
+    icon: Sparkles,
+    title: `${CATEGORIES.length} Culture Categories`,
+    description: 'Food to fashion, history to Nollywood — test what you really know.',
+    color: 'text-festive-gold',
+    bg: 'bg-festive-gold/10 dark:bg-festive-gold/10',
+  },
+  {
+    icon: Users,
+    title: 'Real-Time Multiplayer',
+    description: 'Challenge friends live and race the clock together.',
+    color: 'text-purple-500',
+    bg: 'bg-purple-50 dark:bg-purple-900/20',
+  },
+  {
+    icon: Award,
+    title: 'Badges & Streaks',
+    description: 'Level up your Naija knowledge, day by day.',
+    color: 'text-nigerian-green',
+    bg: 'bg-nigerian-green/10 dark:bg-nigerian-green/10',
+  },
+  {
+    icon: Globe2,
+    title: 'Global Leaderboard',
+    description: 'See how you rank against players nationwide.',
+    color: 'text-blue-500',
+    bg: 'bg-blue-50 dark:bg-blue-900/20',
+  },
 ];
 
 export function Home() {
@@ -119,7 +150,7 @@ export function Home() {
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'Total Score', value: progress.totalScore.toLocaleString(), emoji: '⭐' },
-            { label: 'Categories', value: `${completedCount}/6`, emoji: '🎯' },
+            { label: 'Categories', value: `${completedCount}/${CATEGORIES.length}`, emoji: '🎯' },
             { label: 'Games', value: progress.totalGamesPlayed.toString(), emoji: '🎮' },
           ].map(stat => (
             <div
@@ -133,27 +164,26 @@ export function Home() {
           ))}
         </div>
 
-        {/* Category quick links */}
+        {/* Why play */}
         <div>
-          <h2 className="font-bold text-gray-800 dark:text-gray-200 text-sm mb-3">Categories</h2>
-          <div className="grid grid-cols-3 gap-2.5">
-            {CATEGORIES.map(cat => {
-              const catProgress = progress.categories[cat.id];
+          <h2 className="font-bold text-gray-800 dark:text-gray-200 text-sm mb-3">Why Showcase Nigeria?</h2>
+          <div className="grid grid-cols-2 gap-2.5">
+            {WHY_PLAY.map((item, i) => {
+              const Icon = item.icon;
               return (
-                <motion.button
-                  key={cat.id}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => dispatch({ type: 'SET_TAB', tab: 'categories' })}
-                  className={`bg-gradient-to-br ${cat.bgGradient} rounded-2xl p-3 text-center relative overflow-hidden`}
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.07, type: 'spring', stiffness: 300, damping: 25 }}
+                  className="bg-white dark:bg-gray-800 rounded-2xl p-3.5 border border-gray-100 dark:border-gray-700 shadow-sm"
                 >
-                  <div className="text-2xl mb-1">{cat.emoji}</div>
-                  <p className="text-white font-bold text-[11px] leading-tight">{cat.label}</p>
-                  {catProgress?.completed && (
-                    <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-white/30 rounded-full flex items-center justify-center">
-                      <span className="text-[8px]">✓</span>
-                    </div>
-                  )}
-                </motion.button>
+                  <div className={`w-9 h-9 rounded-xl ${item.bg} flex items-center justify-center mb-2`}>
+                    <Icon size={18} className={item.color} />
+                  </div>
+                  <p className="font-bold text-gray-900 dark:text-white text-xs leading-tight">{item.title}</p>
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1 leading-snug">{item.description}</p>
+                </motion.div>
               );
             })}
           </div>
