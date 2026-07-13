@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GameProvider, useGame } from './context/GameContext';
 import { BottomNav } from './components/ui/BottomNav';
@@ -7,16 +7,27 @@ import { Categories } from './pages/Categories';
 import { QuizPlay } from './pages/QuizPlay';
 import { Leaderboard } from './pages/Leaderboard';
 import { Profile } from './pages/Profile';
+import { Onboarding } from './pages/Onboarding';
 import { useDarkMode } from './hooks/useDarkMode';
 
 interface DarkModeCtx { isDark: boolean; toggle: () => void; }
 export const DarkModeContext = createContext<DarkModeCtx>({ isDark: false, toggle: () => { } });
 export const useDark = () => useContext(DarkModeContext);
 
+interface UserCtx { name: string | null; country: string | null; setUser: (name: string, country: string) => void; }
+export const UserContext = createContext<UserCtx>({ name: null, country: null, setUser: () => { } });
+export const useUser = () => useContext(UserContext);
+
 function AppContent() {
   const { state } = useGame();
   const { activeTab, session } = state;
+  const { name, country } = useUser();
   const showQuiz = !!session;
+  const showOnboarding = !name || !country;
+
+  if (showOnboarding) {
+    return <Onboarding onComplete={(n, c) => useUser().setUser(n, c)} />;
+  }
 
   return (
     <div className="w-full max-w-md mx-auto min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 relative">
@@ -55,13 +66,42 @@ function AppContent() {
   );
 }
 
+function UserProvider({ children }: { children: React.ReactNode }) {
+  const [name, setName] = useState<string | null>(null);
+  const [country, setCountry] = useState<string | null>(null);
+
+  useEffect(() => {
+    const savedName = localStorage.getItem('userName');
+    const savedCountry = localStorage.getItem('userCountry');
+    if (savedName && savedCountry) {
+      setName(savedName);
+      setCountry(savedCountry);
+    }
+  }, []);
+
+  const setUser = (n: string, c: string) => {
+    localStorage.setItem('userName', n);
+    localStorage.setItem('userCountry', c);
+    setName(n);
+    setCountry(c);
+  };
+
+  return (
+    <UserContext.Provider value={{ name, country, setUser }}>
+      {children}
+    </UserContext.Provider>
+  );
+}
+
 export default function App() {
   const darkMode = useDarkMode();
   return (
     <DarkModeContext.Provider value={darkMode}>
-      <GameProvider>
-        <AppContent />
-      </GameProvider>
+      <UserProvider>
+        <GameProvider>
+          <AppContent />
+        </GameProvider>
+      </UserProvider>
     </DarkModeContext.Provider>
   );
 }

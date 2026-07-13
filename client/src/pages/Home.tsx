@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, PlayCircle, ChevronRight } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import { useProgress } from '../hooks/useProgress';
+import { useUser } from '../App';
 import { CATEGORIES } from '../types/quiz';
 
 import welcomeImg from '../assets/welcome.jpg';
@@ -23,6 +24,7 @@ const HERO_IMAGES = [
 export function Home() {
   const { dispatch } = useGame();
   const { progress } = useProgress();
+  const { name, country } = useUser();
   const [heroIndex, setHeroIndex] = useState(0);
 
   useEffect(() => {
@@ -85,7 +87,7 @@ export function Home() {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-xl font-black text-gray-900 dark:text-white">
-              {progress.username ? `Howdy, ${progress.username}! 👋` : 'Welcome, User!'}
+              {name && country ? `Welcome, ${name} from the land of ${country}?` : 'Welcome!'}
             </h1>
             <p className="text-gray-400 dark:text-gray-500 text-sm mt-0.5">
               How much you know about Nigeria?
