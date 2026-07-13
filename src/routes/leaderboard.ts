@@ -1,19 +1,16 @@
 import { Router } from 'express';
+import { pool } from '../db.js';
 
 const router = Router();
 
-// In-memory leaderboard — resets on server restart
-// In production, replace with a database
-const entries: { username: string; score: number; category: string; timestamp: number }[] = [];
-
-router.get('/', (_req, res) => {
-  const sorted = [...entries]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 50);
-  res.json({ leaderboard: sorted });
+router.get('/', async (_req, res) => {
+  const { rows } = await pool.query(
+    'SELECT username, score, category, timestamp FROM leaderboard ORDER BY score DESC LIMIT 50'
+  );
+  res.json({ leaderboard: rows });
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { username, score, category } = req.body as {
     username: string;
     score: number;
@@ -24,7 +21,10 @@ router.post('/', (req, res) => {
     return;
   }
   const entry = { username: username.slice(0, 20), score, category, timestamp: Date.now() };
-  entries.push(entry);
+  await pool.query(
+    'INSERT INTO leaderboard (username, score, category, timestamp) VALUES ($1, $2, $3, $4)',
+    [entry.username, entry.score, entry.category, entry.timestamp]
+  );
   res.json({ ok: true, entry });
 });
 
