@@ -1,25 +1,39 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Edit3, Flame, Star, Target, Moon, Sun } from 'lucide-react';
+import { Edit3, Flame, Star, Target, Moon, Sun, Info, ChevronRight, Trophy, Award } from 'lucide-react';
 import { useProgress } from '../context/ProgressContext';
 import { BADGES } from '../types/progress';
 import { useDark } from '../App';
+import { About } from './About';
+import { YourScores } from './YourScores';
+import { Badges } from './Badges';
 import logoImg from '../assets/logo2.png';
+
+type ProfileView = 'menu' | 'about' | 'scores' | 'badges';
 
 export function Profile() {
   const { progress, setUsername } = useProgress();
   const { isDark, toggle: toggleDark } = useDark();
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(progress.username);
+  const [view, setView] = useState<ProfileView>('menu');
 
-  const earnedBadges = BADGES.filter(b => progress.badges.includes(b.id));
-  const unearnedBadges = BADGES.filter(b => !progress.badges.includes(b.id));
+  const earnedBadgeCount = BADGES.filter(b => progress.badges.includes(b.id)).length;
   const completedCats = Object.values(progress.categories).filter(c => c.completed).length;
 
   const saveName = () => {
     if (nameInput.trim()) setUsername(nameInput.trim());
     setEditingName(false);
   };
+
+  if (view === 'about') return <About onBack={() => setView('menu')} />;
+  if (view === 'scores') return <YourScores onBack={() => setView('menu')} />;
+  if (view === 'badges') return <Badges onBack={() => setView('menu')} />;
+
+  const menuItems = [
+    { icon: Trophy, label: 'Your Scores', onClick: () => setView('scores') },
+    { icon: Award, label: 'Badges', onClick: () => setView('badges') },
+    { icon: Info, label: 'About & Privacy Policy', onClick: () => setView('about') },
+  ];
 
   return (
     <div className="flex flex-col min-h-full pb-24">
@@ -99,57 +113,30 @@ export function Profile() {
           })}
         </div>
 
-        {/* Earned badges */}
-        {earnedBadges.length > 0 && (
-          <div>
-            <h2 className="font-bold text-gray-800 dark:text-gray-200 text-sm mb-3">
-              Badges Earned ({earnedBadges.length}/{BADGES.length})
-            </h2>
-            <div className="grid grid-cols-2 gap-2">
-              {earnedBadges.map((badge, i) => (
-                <motion.div
-                  key={badge.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-festive-gold/30 dark:border-festive-gold/20 shadow-sm"
-                >
-                  <div className="text-2xl mb-1">{badge.emoji}</div>
-                  <p className="font-bold text-gray-900 dark:text-white text-sm">{badge.label}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{badge.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Locked badges */}
-        {unearnedBadges.length > 0 && (
-          <div>
-            <h2 className="font-bold text-gray-400 dark:text-gray-500 text-sm mb-3">Locked Badges</h2>
-            <div className="grid grid-cols-2 gap-2">
-              {unearnedBadges.map(badge => (
-                <div
-                  key={badge.id}
-                  className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-3 border border-gray-100 dark:border-gray-700 opacity-60"
-                >
-                  <div className="text-2xl mb-1 grayscale">{badge.emoji}</div>
-                  <p className="font-bold text-gray-500 dark:text-gray-400 text-sm">{badge.label}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{badge.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* No badges yet */}
-        {earnedBadges.length === 0 && unearnedBadges.length === BADGES.length && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 text-center shadow-sm">
-            <p className="text-4xl mb-2">🏅</p>
-            <p className="font-bold text-gray-700 dark:text-gray-300">No badges yet</p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Complete quizzes to earn badges!</p>
-          </div>
-        )}
+        {/* Menu links */}
+        <div className="flex flex-col gap-2">
+          {menuItems.map(item => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.label}
+                onClick={item.onClick}
+                className="w-full bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-3"
+              >
+                <Icon size={18} className="text-gray-400" />
+                <span className="flex-1 text-left font-semibold text-gray-700 dark:text-gray-300 text-sm">
+                  {item.label}
+                </span>
+                {item.label === 'Badges' && (
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {earnedBadgeCount}/{BADGES.length}
+                  </span>
+                )}
+                <ChevronRight size={16} className="text-gray-300" />
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -27,8 +27,9 @@ router.post('/', async (req, res) => {
     res.status(503).json({ error: 'Leaderboard unavailable: database not configured' });
     return;
   }
-  const { username, score, category } = req.body as {
+  const { username, email, score, category } = req.body as {
     username: string;
+    email?: string;
     score: number;
     category: string;
   };
@@ -39,8 +40,8 @@ router.post('/', async (req, res) => {
   try {
     const timestamp = Date.now();
     const [entry] = await sql`
-      INSERT INTO leaderboard (username, score, category, timestamp)
-      VALUES (${username.slice(0, 20)}, ${score}, ${category}, ${timestamp})
+      INSERT INTO leaderboard (username, email, score, category, timestamp)
+      VALUES (${username.slice(0, 20)}, ${email?.trim().slice(0, 254) || null}, ${score}, ${category}, ${timestamp})
       RETURNING username, score, category, timestamp
     `;
     res.json({ ok: true, entry });

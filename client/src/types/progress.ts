@@ -10,6 +10,7 @@ export interface CategoryProgress {
 
 export interface UserProgress {
   username: string;
+  email: string;
   totalScore: number;
   currentStreak: number;
   longestStreak: number;
@@ -110,6 +111,7 @@ export const BADGES: Badge[] = [
 
 export const DEFAULT_PROGRESS: UserProgress = {
   username: '',
+  email: '',
   totalScore: 0,
   currentStreak: 1,
   longestStreak: 1,

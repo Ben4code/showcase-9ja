@@ -41,9 +41,10 @@ function shuffle<T>(arr: T[]): T[] {
 
 export function Categories() {
   const { dispatch, state } = useGame();
-  const { progress, setUsername } = useProgress();
+  const { progress, setUsername, setEmail } = useProgress();
   const [selected, setSelected] = useState<CategoryId | null>(null);
   const [nameInput, setNameInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
 
   const needsName = !progress.username.trim();
 
@@ -52,12 +53,15 @@ export function Categories() {
       const trimmed = nameInput.trim();
       if (!trimmed) return;
       setUsername(trimmed);
+      const trimmedEmail = emailInput.trim();
+      if (trimmedEmail) setEmail(trimmedEmail);
     }
     const questions = shuffle(QUESTION_BANK[categoryId]).slice(0, 10);
     dispatch({ type: 'START_SOLO', categoryId, questions });
     dispatch({ type: 'SET_TAB', tab: 'categories' });
     setSelected(null);
     setNameInput('');
+    setEmailInput('');
   };
 
   const selectedCat = CATEGORIES.find(c => c.id === selected);
@@ -154,6 +158,23 @@ export function Categories() {
                     onChange={e => setNameInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && !startDisabled && confirmStart(selected)}
                     maxLength={20}
+                  />
+
+                  <label htmlFor="quiz-email" className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-4 block">
+                    Email <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
+                  </label>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 mb-2">
+                    We'll never show this publicly — only used if we ever need to reach you about your scores.
+                  </p>
+                  <input
+                    id="quiz-email"
+                    type="email"
+                    className="w-full bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-2xl px-4 py-3 text-gray-900 dark:text-white font-medium focus:outline-none focus:border-nigerian-green dark:placeholder-gray-500"
+                    placeholder="you@example.com"
+                    value={emailInput}
+                    onChange={e => setEmailInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && !startDisabled && confirmStart(selected)}
+                    maxLength={254}
                   />
                 </motion.div>
               )}

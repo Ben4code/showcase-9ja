@@ -78,6 +78,7 @@ export function QuizPlay() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             username: progress.username,
+            email: progress.email || undefined,
             score: quizResult.score,
             category: quizResult.categoryId,
           }),
@@ -88,7 +89,7 @@ export function QuizPlay() {
     } else {
       dispatch({ type: 'NEXT_QUESTION' });
     }
-  }, [session, dispatch, recordResult, progress.username]);
+  }, [session, dispatch, recordResult, progress.username, progress.email]);
 
   const handleReplay = () => {
     dispatch({ type: 'RESET_SESSION' });

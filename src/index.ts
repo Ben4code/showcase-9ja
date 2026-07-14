@@ -3,9 +3,10 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { createApp } from './app.js';
 import { registerHandlers } from './socket/handlers.js';
-import { initDb } from './db.js';
+import { initDb, purgeExpiredEntries } from './db.js';
 
 const PORT = Number(process.env.PORT ?? 3001);
+const PURGE_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const app = createApp();
 const httpServer = createServer(app);
 
@@ -27,6 +28,8 @@ initDb()
     httpServer.listen(PORT, () => {
       console.log(`🟢 Showcase Nigeria server running on http://localhost:${PORT}`);
     });
+    purgeExpiredEntries();
+    setInterval(purgeExpiredEntries, PURGE_INTERVAL_MS);
   })
   .catch(err => {
     console.error('❌ Failed to initialise database:', err);

@@ -32,11 +32,20 @@ function checkBadges(progress: UserProgress): string[] {
 }
 
 export function useProgress() {
-  const [progress, setProgress] = useLocalStorage<UserProgress>(STORAGE_KEY, DEFAULT_PROGRESS);
+  const [rawProgress, setProgress] = useLocalStorage<UserProgress>(STORAGE_KEY, DEFAULT_PROGRESS);
+  // Merge in any fields added to UserProgress after this user's data was first saved.
+  const progress: UserProgress = { ...DEFAULT_PROGRESS, ...rawProgress };
 
   const setUsername = useCallback(
     (username: string) => {
       setProgress(p => ({ ...p, username }));
+    },
+    [setProgress]
+  );
+
+  const setEmail = useCallback(
+    (email: string) => {
+      setProgress(p => ({ ...p, email }));
     },
     [setProgress]
   );
@@ -79,5 +88,5 @@ export function useProgress() {
     []
   );
 
-  return { progress, setProgress, setUsername, recordResult, getNewBadges };
+  return { progress, setProgress, setUsername, setEmail, recordResult, getNewBadges };
 }
