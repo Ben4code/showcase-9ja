@@ -1,16 +1,15 @@
 import { createContext, useContext } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { SocketProvider } from './context/SocketContext';
 import { GameProvider, useGame } from './context/GameContext';
 import { ProgressProvider } from './context/ProgressContext';
 import { BottomNav } from './components/ui/BottomNav';
 import { Home } from './pages/Home';
 import { Categories } from './pages/Categories';
 import { QuizPlay } from './pages/QuizPlay';
-import { MultiplayerHub } from './pages/MultiplayerHub';
 import { Leaderboard } from './pages/Leaderboard';
 import { Profile } from './pages/Profile';
 import { useDarkMode } from './hooks/useDarkMode';
+// import { SocketProvider } from './context/SocketContext';
 
 interface DarkModeCtx { isDark: boolean; toggle: () => void; }
 export const DarkModeContext = createContext<DarkModeCtx>({ isDark: false, toggle: () => { } });
@@ -47,7 +46,6 @@ function AppContent() {
             >
               {activeTab === 'home' && <Home />}
               {activeTab === 'categories' && <Categories />}
-              {activeTab === 'multiplayer' && <MultiplayerHub />}
               {activeTab === 'leaderboard' && <Leaderboard />}
               {activeTab === 'profile' && <Profile />}
             </motion.div>
@@ -64,11 +62,11 @@ export default function App() {
   return (
     <DarkModeContext.Provider value={darkMode}>
       <ProgressProvider>
-        <SocketProvider>
-          <GameProvider>
-            <AppContent />
-          </GameProvider>
-        </SocketProvider>
+        {/* <SocketProvider> */}
+        <GameProvider>
+          <AppContent />
+        </GameProvider>
+        {/* </SocketProvider> */}
       </ProgressProvider>
     </DarkModeContext.Provider>
   );
